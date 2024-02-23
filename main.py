@@ -1,13 +1,18 @@
+import os
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
 import time
 from ttkbootstrap import ttk
 from ttkbootstrap import Style
+from openpyxl import load_workbook
 
+file_one = ""
+file_two = ""
 
 
 def upload_reader_data():
+    global file_one
     filepath = filedialog.askopenfilename()
     if filepath:
         entry_reader_data_path.config(state=tk.NORMAL)
@@ -15,9 +20,11 @@ def upload_reader_data():
         entry_reader_data_path.insert(0, filepath)
         entry_reader_data_path.config(state=tk.DISABLED)
         # 在这里添加处理上传文件的逻辑
+        file_one = filepath
 
 
 def upload_matching_data():
+    global file_two
     filepath = filedialog.askopenfilename()
     if filepath:
         entry_matching_data_path.config(state=tk.NORMAL)
@@ -25,16 +32,51 @@ def upload_matching_data():
         entry_matching_data_path.insert(0, filepath)
         entry_matching_data_path.config(state=tk.DISABLED)
         # 在这里添加处理上传文件的逻辑
+        file_two = filepath
 
 
 def generate_files():
+    if file_one == "" or file_two == "":
+        messagebox.showinfo("提醒", "请先上传文件")
+        return
     folderpath = filedialog.askdirectory()
     if folderpath:
-        # 在这里添加生成文件的逻辑
-        for i in range(100):
-            progress_var.set(i + 1)
+        wb1 = load_workbook(filename=file_one)
+        ws1 = wb1[wb1.sheetnames[0]]
+        column_data = []
+        for cell in ws1['A']:
+            column_data.append(cell.value)
+
+        wb2 = load_workbook(filename=file_two)
+        ws2 = wb2[wb2.sheetnames[0]]
+
+        max_row = 1
+        for cell in ws2['A']:
+            if cell.value is None:
+                max_row = cell.row
+
+        result = 0
+        block = 100 / max_row
+
+        i = 1
+        ws2['D1'] = "Attendance"
+        for cell in ws2['C']:
+            if i > 1:
+                if cell.value in column_data:
+                    ws2['D' + str(i)] = "Present 出席"
+                else:
+                    ws2['D' + str(i)] = "Absent 缺席"
+            i = i + 1
+            result = result + block
+            if result > 100:
+                result = 100
+            progress_var.set(result)
             app.update_idletasks()
-            time.sleep(0.05)
+
+        file_name = '结果数据.xlsx'
+        file_path = os.path.join(folderpath, file_name)
+        # 保存工作簿
+        wb2.save(file_path)
         messagebox.showinfo("信息", "文件已成功生成于: " + folderpath)
         progress_var.set(0)
         app.update_idletasks()
