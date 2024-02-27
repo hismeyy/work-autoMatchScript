@@ -75,7 +75,7 @@ def generate_files():
             app.update_idletasks()
 
         # 获取当前系统日期
-        current_date = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+        current_date = datetime.now().strftime("%Y-%m-%d")
 
         file_name = '结果数据' + str(current_date) + ".xlsx"
         file_path = os.path.join(folderpath, file_name)
