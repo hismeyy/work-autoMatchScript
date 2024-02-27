@@ -6,6 +6,7 @@ import time
 from ttkbootstrap import ttk
 from ttkbootstrap import Style
 from openpyxl import load_workbook
+from datetime import datetime
 
 file_one = ""
 file_two = ""
@@ -73,7 +74,10 @@ def generate_files():
             progress_var.set(result)
             app.update_idletasks()
 
-        file_name = '结果数据.xlsx'
+        # 获取当前系统日期
+        current_date = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+
+        file_name = '结果数据' + str(current_date) + ".xlsx"
         file_path = os.path.join(folderpath, file_name)
         # 保存工作簿
         wb2.save(file_path)
