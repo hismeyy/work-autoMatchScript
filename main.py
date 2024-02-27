@@ -87,6 +87,7 @@ app.withdraw()
 style = Style(theme='sandstone')
 TOP6 = style.master
 app.title("自动匹配脚本")
+app.iconbitmap('./logo.ico')
 app.update_idletasks()
 window_width = app.winfo_width()
 window_height = app.winfo_height()
